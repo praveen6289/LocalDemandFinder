@@ -1,31 +1,37 @@
-import { getAllInsights, getInsightById } from "../services/insightService.js";
+var insightService = require("../services/insightService");
 
-export async function getProducts(req, res, next) {
-  try {
-    const products = await getAllInsights({
+function getProducts(req, res, next) {
+  insightService
+    .getAllInsights({
       location: req.query.location,
       category: req.query.category
+    })
+    .then(function (products) {
+      res.json(products);
+    })
+    .catch(function (error) {
+      next(error);
     });
-
-    res.json(products);
-  } catch (error) {
-    next(error);
-  }
 }
 
-export async function getProductById(req, res, next) {
-  try {
-    const product = await getInsightById(req.params.id);
+function getProductById(req, res, next) {
+  insightService
+    .getInsightById(req.params.id)
+    .then(function (product) {
+      if (!product) {
+        return res.status(404).json({
+          message: "Product not found"
+        });
+      }
 
-    if (!product) {
-      return res.status(404).json({
-        message: "Product not found"
-      });
-    }
-
-    res.json(product);
-  } catch (error) {
-    next(error);
-  }
+      return res.json(product);
+    })
+    .catch(function (error) {
+      next(error);
+    });
 }
 
+module.exports = {
+  getProducts: getProducts,
+  getProductById: getProductById
+};

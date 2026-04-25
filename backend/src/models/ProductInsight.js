@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+var mongoose = require("mongoose");
 
-const productInsightSchema = new mongoose.Schema(
+var productInsightSchema = new mongoose.Schema(
   {
     insightKey: {
       type: String,
@@ -74,5 +74,8 @@ const productInsightSchema = new mongoose.Schema(
   }
 );
 
-export const ProductInsight = mongoose.model("ProductInsight", productInsightSchema);
+var ProductInsight = mongoose.model("ProductInsight", productInsightSchema);
 
+module.exports = {
+  ProductInsight: ProductInsight
+};

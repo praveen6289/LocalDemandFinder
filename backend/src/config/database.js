@@ -1,13 +1,17 @@
-import mongoose from "mongoose";
-import { env } from "./env.js";
+var mongoose = require("mongoose");
+var env = require("./env").env;
 
-export async function connectDatabase() {
+function connectDatabase() {
   if (env.useMockData) {
     console.log("Using mock data mode. MongoDB connection skipped.");
-    return;
+    return Promise.resolve();
   }
 
-  await mongoose.connect(env.mongoUri);
-  console.log("Connected to MongoDB.");
+  return mongoose.connect(env.mongoUri).then(function () {
+    console.log("Connected to MongoDB.");
+  });
 }
 
+module.exports = {
+  connectDatabase: connectDatabase
+};

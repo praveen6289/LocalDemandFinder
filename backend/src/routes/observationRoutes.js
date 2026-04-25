@@ -1,9 +1,8 @@
-import { Router } from "express";
-import { addObservation } from "../controllers/observationController.js";
+var Router = require("express").Router;
+var addObservation = require("../controllers/observationController").addObservation;
 
-const router = Router();
+var router = Router();
 
 router.post("/", addObservation);
 
-export default router;
-
+module.exports = router;

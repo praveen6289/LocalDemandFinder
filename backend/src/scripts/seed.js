@@ -1,27 +1,27 @@
-import mongoose from "mongoose";
-import { env } from "../config/env.js";
-import { mockObservations } from "../data/mockObservations.js";
-import { ProductObservation } from "../models/ProductObservation.js";
-import { persistInsightsToDatabase } from "../services/insightService.js";
+var mongoose = require("mongoose");
+var env = require("../config/env").env;
+var mockObservations = require("../data/mockObservations").mockObservations;
+var ProductObservation = require("../models/ProductObservation").ProductObservation;
+var persistInsightsToDatabase = require("../services/insightService").persistInsightsToDatabase;
 
-async function seed() {
-  await mongoose.connect(env.mongoUri);
-
-  await ProductObservation.deleteMany({});
-  await ProductObservation.insertMany(
-    mockObservations.map((observation) => ({
-      ...observation
-    }))
-  );
-
-  const insightCount = await persistInsightsToDatabase();
-
-  console.log(`Seeded ${mockObservations.length} observations and ${insightCount} product insights.`);
-
-  await mongoose.disconnect();
+function seed() {
+  return mongoose.connect(env.mongoUri)
+    .then(function () {
+      return ProductObservation.deleteMany({});
+    })
+    .then(function () {
+      return ProductObservation.insertMany(mockObservations);
+    })
+    .then(function () {
+      return persistInsightsToDatabase();
+    })
+    .then(function (insightCount) {
+      console.log("Seeded " + mockObservations.length + " observations and " + insightCount + " product insights.");
+      return mongoose.disconnect();
+    });
 }
 
-seed().catch((error) => {
+seed().catch(function (error) {
   console.error("Seed failed", error);
   process.exit(1);
 });

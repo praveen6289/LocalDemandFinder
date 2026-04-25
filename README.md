@@ -9,6 +9,12 @@ Local Demand Finder is a mock-first full-stack web app that helps small sellers 
 - Database: MongoDB + Mongoose
 - Styling: Custom responsive CSS with a SaaS dashboard layout
 
+## Backend Style
+
+- Backend code now uses ES5-style/CommonJS syntax
+- REST API routes and response design remain the same
+- Frontend remains modern React/Vite code
+
 ## Features
 
 - Dashboard with trending products, demand scores, pricing guidance, and recommendations

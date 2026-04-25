@@ -1,12 +1,15 @@
-import { getDashboardData } from "../services/insightService.js";
+var getDashboardData = require("../services/insightService").getDashboardData;
 
-export async function getDashboard(req, res, next) {
-  try {
-    const data = await getDashboardData(req.query.location);
-    res.json(data);
-  } catch (error) {
-    next(error);
-  }
+function getDashboard(req, res, next) {
+  getDashboardData(req.query.location)
+    .then(function (data) {
+      res.json(data);
+    })
+    .catch(function (error) {
+      next(error);
+    });
 }
 
-//praveen
+module.exports = {
+  getDashboard: getDashboard
+};
