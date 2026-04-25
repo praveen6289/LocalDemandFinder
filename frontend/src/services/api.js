@@ -48,3 +48,58 @@ export function getProductDetails(id) {
   return request(`/products/${id}`);
 }
 
+export function getIntegrationStatus() {
+  return request("/integrations/status");
+}
+
+export function refreshIntegrationStatus(liveMode = false) {
+  const query = new URLSearchParams({
+    liveMode: String(liveMode)
+  });
+
+  return request(`/integrations/refresh?${query.toString()}`, {
+    method: "POST"
+  });
+}
+
+export function getTrendIntegration(payload) {
+  const query = new URLSearchParams({
+    keyword: payload.keyword,
+    location: payload.location || "",
+    liveMode: String(Boolean(payload.liveMode))
+  });
+
+  return request(`/integrations/trends?${query.toString()}`);
+}
+
+export function getYoutubeIntegration(payload) {
+  const query = new URLSearchParams({
+    keyword: payload.keyword,
+    location: payload.location || "",
+    liveMode: String(Boolean(payload.liveMode))
+  });
+
+  return request(`/integrations/youtube?${query.toString()}`);
+}
+
+export function getShoppingIntegration(payload) {
+  const query = new URLSearchParams({
+    keyword: payload.keyword,
+    category: payload.category || "",
+    location: payload.location || "",
+    liveMode: String(Boolean(payload.liveMode))
+  });
+
+  return request(`/integrations/shopping?${query.toString()}`);
+}
+
+export function analyzeOpportunity(payload) {
+  const query = new URLSearchParams({
+    keyword: payload.keyword,
+    category: payload.category,
+    location: payload.location,
+    liveMode: String(Boolean(payload.liveMode))
+  });
+
+  return request(`/opportunity/analyze?${query.toString()}`);
+}

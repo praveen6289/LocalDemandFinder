@@ -3,6 +3,8 @@ import { NavLink } from "react-router-dom";
 const navigationItems = [
   { to: "/", label: "Dashboard" },
   { to: "/analyze-product", label: "Analyze Product" },
+  { to: "/product-opportunity", label: "Product Opportunity" },
+  { to: "/integration-status", label: "Integration Status" },
   { to: "/add-product-data", label: "Add Product Data" }
 ];
 
@@ -42,4 +44,3 @@ export default function AppShell({ children }) {
     </div>
   );
 }
-

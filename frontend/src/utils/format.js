@@ -16,3 +16,13 @@ export function formatDate(value) {
   }).format(new Date(value));
 }
 
+export function formatDateTime(value) {
+  if (!value) {
+    return "Not synced yet";
+  }
+
+  return new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(new Date(value));
+}

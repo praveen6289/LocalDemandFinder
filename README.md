@@ -23,6 +23,11 @@ Local Demand Finder is a mock-first full-stack web app that helps small sellers 
 - Product details page with metric breakdown and observation history
 - Opportunity alerts when demand is high and competition is low
 - Mock-first data mode so the app works before any scraping or third-party integrations
+- Modular integration layer for trends, marketplace data, social signals, and price tracking
+- Integration status page with manual refresh
+- Product opportunity page with combined demand and competition analysis
+- Live Data Mode toggle with source-wise Google Trends, YouTube, Shopping, and optional Instagram data
+- 24-hour API response caching to reduce cost when MongoDB mode is enabled
 
 ## Project Structure
 
@@ -82,6 +87,44 @@ Frontend runs on `http://localhost:5173`
 
 Backend runs on `http://localhost:5000`
 
+## Live API Setup
+
+Add these values to `backend/.env` when you want live integrations:
+
+```text
+GOOGLE_TRENDS_API_KEY=
+GOOGLE_TRENDS_API_URL=
+YOUTUBE_API_KEY=
+SERPAPI_KEY=
+META_ACCESS_TOKEN=
+INSTAGRAM_BUSINESS_ACCOUNT_ID=
+API_CACHE_TTL_HOURS=24
+```
+
+Notes:
+
+- Google Trends does not have a stable public official API documented in the sources I checked, so this project uses the `google-trends-api` npm package as the default live fallback.
+- `GOOGLE_TRENDS_API_URL` is optional and only needed if you have access to a private or alpha Trends endpoint.
+- Instagram is optional and only used when both Meta credentials are provided.
+- If live providers fail or keys are missing, the app falls back to mock data and marks the result as partial when appropriate.
+
+### API key setup
+
+1. Google Trends
+   Use the built-in `google-trends-api` package fallback first. If you later receive access to a private or alpha Trends endpoint, set both `GOOGLE_TRENDS_API_URL` and `GOOGLE_TRENDS_API_KEY`.
+2. YouTube Data API
+   Create a Google Cloud project, enable `YouTube Data API v3`, then generate an API key and place it in `YOUTUBE_API_KEY`.
+3. SerpApi
+   Create a SerpApi account, enable Google Shopping usage on your plan, then copy the API key into `SERPAPI_KEY`.
+4. Instagram Graph API (optional)
+   Create a Meta app, connect an Instagram Business or Creator account, generate a long-lived access token, and set both `META_ACCESS_TOKEN` and `INSTAGRAM_BUSINESS_ACCOUNT_ID`.
+
+### Cache behavior
+
+- API responses are cached for 24 hours.
+- In MongoDB mode, cached responses are stored in MongoDB.
+- In mock mode, cache falls back to in-memory storage.
+
 ## MongoDB Setup
 
 This first version defaults to mock data so the app works immediately.
@@ -98,23 +141,28 @@ npm run seed
 
 ## Scoring Logic
 
-Demand score is calculated from normalized inputs:
+The live opportunity engine calculates demand from four source families:
 
 ```text
-demandScore = searchInterest * 0.5 + normalizedReviews * 0.3 + priceTrend * 0.2
+demandScore =
+  googleSearchInterest * 0.45 +
+  youtubeEngagementScore * 0.25 +
+  shoppingReviewScore * 0.20 +
+  priceStabilityScore * 0.10
 ```
 
-- `searchInterest` is expected on a 0-100 scale
-- `normalizedReviews` is derived from `reviewsCount` and capped at 100
-- `priceTrend` is a derived trend score on a 0-100 scale
+Competition score is:
 
-Competition score is based on `numberOfSellers`.
+```text
+competitionScore = numberOfShoppingResults + repeatedSimilarProducts
+```
 
 Recommendations:
 
 - `ENTER` when demand is above 70 and competition is low
-- `WAIT` when demand is between 40 and 70 with manageable competition
-- `AVOID` when demand is below 40 or competition is high
+- `TEST SMALL QTY` when demand is above 70 and competition is high
+- `WAIT` when demand is between 40 and 70
+- `AVOID` when demand is below 40
 
 ## Seed Data
 
@@ -135,9 +183,27 @@ The backend includes sample observations for products such as:
 - `GET /api/products/:id`
 - `POST /api/analysis/analyze`
 - `POST /api/observations`
+- `GET /api/trends?keyword=&location=`
+- `GET /api/marketplace/search?keyword=&category=&location=`
+- `GET /api/price/average?productName=&category=&location=`
+- `GET /api/opportunity/analyze?keyword=&category=&location=`
+- `GET /api/integrations/status`
+- `POST /api/integrations/refresh`
+- `GET /api/integrations/trends?keyword=&location=&liveMode=`
+- `GET /api/integrations/youtube?keyword=&location=&liveMode=`
+- `GET /api/integrations/shopping?keyword=&location=&liveMode=`
+
+Live integration response highlights:
+
+- `/api/integrations/trends` returns `keyword`, `location`, `searchInterest`, `trendDirection`, and `relatedQueries`
+- `/api/integrations/youtube` returns `videoCount`, `topVideos`, `totalViewsApprox`, and `engagementScore`
+- `/api/integrations/shopping` returns normalized shopping items with `productName`, `source`, `price`, `rating`, `reviews`, `link`, and `thumbnail`
+- `/api/opportunity/analyze` combines all available live or fallback sources and flags `partialData` when one provider fails
 
 ## Extensibility Notes
 
 - Mock data and repository logic are isolated so external APIs or scraping jobs can plug in later
 - MongoDB models are already in place for raw observations and stored product insights
 - The frontend uses a central API client so backend integrations can evolve without rewiring page components
+- Integration providers live under `backend/src/integrations/` so sources can be added or removed cleanly
+- Retry logic, rate limiting, and user-agent config are built into the provider runner
