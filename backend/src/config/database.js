@@ -1,17 +1,16 @@
-var mongoose = require("mongoose");
-var env = require("./env").env;
+const mongoose = require("mongoose");
+const { env } = require("./env");
 
-function connectDatabase() {
+async function connectDatabase() {
   if (env.useMockData) {
     console.log("Using mock data mode. MongoDB connection skipped.");
-    return Promise.resolve();
+    return;
   }
 
-  return mongoose.connect(env.mongoUri).then(function () {
-    console.log("Connected to MongoDB.");
-  });
+  await mongoose.connect(env.mongoUri);
+  console.log("Connected to MongoDB.");
 }
 
 module.exports = {
-  connectDatabase: connectDatabase
+  connectDatabase
 };

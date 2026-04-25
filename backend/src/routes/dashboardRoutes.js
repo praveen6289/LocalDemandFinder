@@ -1,7 +1,7 @@
-var Router = require("express").Router;
-var getDashboard = require("../controllers/dashboardController").getDashboard;
+const { Router } = require("express");
+const { getDashboard } = require("../controllers/dashboardController");
 
-var router = Router();
+const router = Router();
 
 router.get("/", getDashboard);
 

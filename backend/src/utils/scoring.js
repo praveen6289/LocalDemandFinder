@@ -23,7 +23,7 @@ function getCompetitionLevel(numberOfSellers) {
 }
 
 function getSuggestedEntryPrice(averageSellingPrice, competitionLevel) {
-  var adjustmentMap = {
+  const adjustmentMap = {
     Low: 0.97,
     Medium: 0.94,
     High: 0.9
@@ -52,12 +52,12 @@ function buildAlert(demandScore, competitionLevel) {
   return "";
 }
 
-function calculateDemandScore(input) {
-  var normalizedReviews = normalizeReviews(input.reviewsCount);
-  var demandScore =
-    input.searchInterest * 0.5 +
+function calculateDemandScore({ searchInterest, reviewsCount, priceTrend }) {
+  const normalizedReviews = normalizeReviews(reviewsCount);
+  const demandScore =
+    searchInterest * 0.5 +
     normalizedReviews * 0.3 +
-    input.priceTrend * 0.2;
+    priceTrend * 0.2;
 
   return {
     demandScore: clampScore(demandScore),
@@ -66,41 +66,39 @@ function calculateDemandScore(input) {
 }
 
 function buildInsightMetrics(input) {
-  var averageSellingPrice = round(input.averageSellingPrice);
-  var competitionScore = round(input.numberOfSellers);
-  var competitionLevel = getCompetitionLevel(competitionScore);
-  var demandResult = calculateDemandScore({
+  const averageSellingPrice = round(input.averageSellingPrice);
+  const competitionScore = round(input.numberOfSellers);
+  const competitionLevel = getCompetitionLevel(competitionScore);
+  const { demandScore, reviewsScore } = calculateDemandScore({
     searchInterest: input.searchInterest,
     reviewsCount: input.reviewsCount,
     priceTrend: input.priceTrend
   });
-  var demandScore = demandResult.demandScore;
-  var reviewsScore = demandResult.reviewsScore;
-  var suggestedEntryPrice = getSuggestedEntryPrice(averageSellingPrice, competitionLevel);
-  var recommendation = getRecommendation(demandScore, competitionLevel);
-  var alert = buildAlert(demandScore, competitionLevel);
+  const suggestedEntryPrice = getSuggestedEntryPrice(averageSellingPrice, competitionLevel);
+  const recommendation = getRecommendation(demandScore, competitionLevel);
+  const alert = buildAlert(demandScore, competitionLevel);
 
   return {
-    demandScore: demandScore,
-    competitionScore: competitionScore,
-    competitionLevel: competitionLevel,
-    averageSellingPrice: averageSellingPrice,
-    suggestedEntryPrice: suggestedEntryPrice,
-    recommendation: recommendation,
-    alert: alert,
-    reviewsScore: reviewsScore,
+    demandScore,
+    competitionScore,
+    competitionLevel,
+    averageSellingPrice,
+    suggestedEntryPrice,
+    recommendation,
+    alert,
+    reviewsScore,
     priceTrend: clampScore(input.priceTrend),
     searchInterest: clampScore(input.searchInterest)
   };
 }
 
 module.exports = {
-  clampScore: clampScore,
-  normalizeReviews: normalizeReviews,
-  getCompetitionLevel: getCompetitionLevel,
-  getSuggestedEntryPrice: getSuggestedEntryPrice,
-  getRecommendation: getRecommendation,
-  buildAlert: buildAlert,
-  calculateDemandScore: calculateDemandScore,
-  buildInsightMetrics: buildInsightMetrics
+  clampScore,
+  normalizeReviews,
+  getCompetitionLevel,
+  getSuggestedEntryPrice,
+  getRecommendation,
+  buildAlert,
+  calculateDemandScore,
+  buildInsightMetrics
 };

@@ -1,4 +1,4 @@
-var mockObservations = [
+const mockObservations = [
   {
     productName: "Reusable Lunch Bag",
     category: "Kitchen",
@@ -134,5 +134,5 @@ var mockObservations = [
 ];
 
 module.exports = {
-  mockObservations: mockObservations
+  mockObservations
 };

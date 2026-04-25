@@ -1,12 +1,9 @@
-function toTitleCase(value) {
-  value = value || "";
+function toTitleCase(value = "") {
   return value
     .toLowerCase()
     .split(" ")
     .filter(Boolean)
-    .map(function (part) {
-      return part.charAt(0).toUpperCase() + part.slice(1);
-    })
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 }
 
@@ -23,13 +20,11 @@ function average(values) {
     return 0;
   }
 
-  return values.reduce(function (total, value) {
-    return total + value;
-  }, 0) / values.length;
+  return values.reduce((total, value) => total + value, 0) / values.length;
 }
 
 module.exports = {
-  toTitleCase: toTitleCase,
-  createInsightKey: createInsightKey,
-  average: average
+  toTitleCase,
+  createInsightKey,
+  average
 };

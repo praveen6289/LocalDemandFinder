@@ -1,15 +1,14 @@
-var getDashboardData = require("../services/insightService").getDashboardData;
+const { getDashboardData } = require("../services/insightService");
 
-function getDashboard(req, res, next) {
-  getDashboardData(req.query.location)
-    .then(function (data) {
-      res.json(data);
-    })
-    .catch(function (error) {
-      next(error);
-    });
+async function getDashboard(req, res, next) {
+  try {
+    const data = await getDashboardData(req.query.location);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
 }
 
 module.exports = {
-  getDashboard: getDashboard
+  getDashboard
 };

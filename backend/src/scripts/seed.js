@@ -1,27 +1,27 @@
-var mongoose = require("mongoose");
-var env = require("../config/env").env;
-var mockObservations = require("../data/mockObservations").mockObservations;
-var ProductObservation = require("../models/ProductObservation").ProductObservation;
-var persistInsightsToDatabase = require("../services/insightService").persistInsightsToDatabase;
+const mongoose = require("mongoose");
+const { env } = require("../config/env");
+const { mockObservations } = require("../data/mockObservations");
+const { ProductObservation } = require("../models/ProductObservation");
+const { persistInsightsToDatabase } = require("../services/insightService");
 
-function seed() {
-  return mongoose.connect(env.mongoUri)
-    .then(function () {
-      return ProductObservation.deleteMany({});
-    })
-    .then(function () {
-      return ProductObservation.insertMany(mockObservations);
-    })
-    .then(function () {
-      return persistInsightsToDatabase();
-    })
-    .then(function (insightCount) {
-      console.log("Seeded " + mockObservations.length + " observations and " + insightCount + " product insights.");
-      return mongoose.disconnect();
-    });
+async function seed() {
+  await mongoose.connect(env.mongoUri);
+
+  await ProductObservation.deleteMany({});
+  await ProductObservation.insertMany(
+    mockObservations.map((observation) => ({
+      ...observation
+    }))
+  );
+
+  const insightCount = await persistInsightsToDatabase();
+
+  console.log(`Seeded ${mockObservations.length} observations and ${insightCount} product insights.`);
+
+  await mongoose.disconnect();
 }
 
-seed().catch(function (error) {
+seed().catch((error) => {
   console.error("Seed failed", error);
   process.exit(1);
 });

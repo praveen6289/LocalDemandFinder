@@ -1,6 +1,6 @@
-var mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
-var productObservationSchema = new mongoose.Schema(
+const productObservationSchema = new mongoose.Schema(
   {
     productName: {
       type: String,
@@ -56,8 +56,8 @@ productObservationSchema.index({
   location: 1
 });
 
-var ProductObservation = mongoose.model("ProductObservation", productObservationSchema);
+const ProductObservation = mongoose.model("ProductObservation", productObservationSchema);
 
 module.exports = {
-  ProductObservation: ProductObservation
+  ProductObservation
 };

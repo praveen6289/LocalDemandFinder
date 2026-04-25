@@ -1,6 +1,6 @@
-var mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
-var productInsightSchema = new mongoose.Schema(
+const productInsightSchema = new mongoose.Schema(
   {
     insightKey: {
       type: String,
@@ -74,8 +74,8 @@ var productInsightSchema = new mongoose.Schema(
   }
 );
 
-var ProductInsight = mongoose.model("ProductInsight", productInsightSchema);
+const ProductInsight = mongoose.model("ProductInsight", productInsightSchema);
 
 module.exports = {
-  ProductInsight: ProductInsight
+  ProductInsight
 };

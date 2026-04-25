@@ -1,7 +1,7 @@
-var Router = require("express").Router;
-var addObservation = require("../controllers/observationController").addObservation;
+const { Router } = require("express");
+const { addObservation } = require("../controllers/observationController");
 
-var router = Router();
+const router = Router();
 
 router.post("/", addObservation);
 

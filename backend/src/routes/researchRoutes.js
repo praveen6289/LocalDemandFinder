@@ -1,7 +1,7 @@
-var Router = require("express").Router;
-var analyze = require("../controllers/researchController").analyze;
+const { Router } = require("express");
+const { analyze } = require("../controllers/researchController");
 
-var router = Router();
+const router = Router();
 
 router.post("/analyze", analyze);
 

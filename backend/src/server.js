@@ -1,18 +1,18 @@
-var createApp = require("./app").createApp;
-var connectDatabase = require("./config/database").connectDatabase;
-var env = require("./config/env").env;
+const { createApp } = require("./app");
+const { connectDatabase } = require("./config/database");
+const { env } = require("./config/env");
 
-function startServer() {
-  return connectDatabase().then(function () {
-    var app = createApp();
+async function startServer() {
+  await connectDatabase();
 
-    app.listen(env.port, function () {
-      console.log("Local Demand Finder API listening on port " + env.port);
-    });
+  const app = createApp();
+
+  app.listen(env.port, () => {
+    console.log(`Local Demand Finder API listening on port ${env.port}`);
   });
 }
 
-startServer().catch(function (error) {
+startServer().catch((error) => {
   console.error("Failed to start server", error);
   process.exit(1);
 });

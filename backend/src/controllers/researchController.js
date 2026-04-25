@@ -1,25 +1,22 @@
-var analyzeProduct = require("../services/insightService").analyzeProduct;
+const { analyzeProduct } = require("../services/insightService");
 
-function analyze(req, res, next) {
-  var productName = req.body.productName;
-  var category = req.body.category;
-  var location = req.body.location;
+async function analyze(req, res, next) {
+  try {
+    const { productName, category, location } = req.body;
 
-  if (!productName || !category || !location) {
-    return res.status(400).json({
-      message: "productName, category, and location are required"
-    });
+    if (!productName || !category || !location) {
+      return res.status(400).json({
+        message: "productName, category, and location are required"
+      });
+    }
+
+    const insight = await analyzeProduct(req.body);
+    res.json(insight);
+  } catch (error) {
+    next(error);
   }
-
-  return analyzeProduct(req.body)
-    .then(function (insight) {
-      res.json(insight);
-    })
-    .catch(function (error) {
-      next(error);
-    });
 }
 
 module.exports = {
-  analyze: analyze
+  analyze
 };
