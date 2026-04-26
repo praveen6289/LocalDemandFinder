@@ -1,5 +1,6 @@
 const liveShoppingClient = require("../integrations/serpapi/serpapiClient");
 const mockMarketplaceIntegration = require("../integrations/marketplace");
+const { env } = require("../config/env");
 
 function round(value) {
   return Math.round(value * 10) / 10;
@@ -43,7 +44,7 @@ function getRepeatedSimilarProducts(items) {
 async function searchMarketplaceProducts({ keyword, category = "", location = "", liveMode = false }) {
   const warnings = [];
 
-  if (liveMode) {
+  if (liveMode && env.hasSerpapi) {
     try {
       const liveResult = await liveShoppingClient.getShoppingResultsData({ keyword, location });
       return {
@@ -70,6 +71,7 @@ async function searchMarketplaceProducts({ keyword, category = "", location = ""
     source: fallback.source,
     modeUsed: "mock",
     summary: buildSummary(items),
+    liveProviderConfigured: env.hasSerpapi,
     warnings
   };
 }

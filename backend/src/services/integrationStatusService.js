@@ -22,7 +22,7 @@ const sourceDefinitions = [
     sourceKey: "shopping",
     sourceName: "Google Shopping via SerpApi",
     envKey: "SERPAPI_KEY",
-    optional: false
+    optional: true
   },
   {
     sourceKey: "instagram",
@@ -49,19 +49,19 @@ const inMemorySyncState = new Map(
 
 function getProviderStatus(sourceKey) {
   if (sourceKey === "googleTrends") {
-    return env.googleTrendsApiKey && env.googleTrendsApiUrl ? "configured" : "package-fallback";
+    return env.hasOfficialGoogleTrendsApi ? "configured" : "package-fallback";
   }
 
   if (sourceKey === "youtube") {
-    return env.youtubeApiKey ? "configured" : "fallback";
+    return env.hasYoutubeApi ? "configured" : "fallback";
   }
 
   if (sourceKey === "shopping") {
-    return env.serpapiKey ? "configured" : "fallback";
+    return env.hasSerpapi ? "configured" : "optional";
   }
 
   if (sourceKey === "instagram") {
-    return env.metaAccessToken && env.instagramBusinessAccountId ? "configured" : "optional";
+    return env.hasInstagramApi ? "configured" : "optional";
   }
 
   return "fallback";
@@ -122,12 +122,14 @@ async function refreshIntegrations(liveMode = false) {
       await saveSyncState({
         sourceKey: "googleTrends",
         sourceName: "Google Trends",
-        status: trend.modeUsed === "live" ? "connected" : "warning",
-        providerType: trend.modeUsed,
+        status: "connected",
+        providerType: trend.source === "google-trends-api-package" ? "package" : trend.modeUsed,
         message:
-          trend.modeUsed === "live"
-            ? "Live Google Trends data connected"
-            : "Fallback to mock Google Trends data",
+          trend.source === "google-trends-api-package"
+            ? "Package-backed Google Trends data connected"
+            : trend.modeUsed === "live"
+              ? "Live Google Trends data connected"
+              : "Fallback to mock Google Trends data",
         lastSyncAt: now,
         lastSuccessAt: now,
         itemsProcessed: trend.relatedQueries.length || 1
@@ -157,7 +159,7 @@ async function refreshIntegrations(liveMode = false) {
       await saveSyncState({
         sourceKey: "instagram",
         sourceName: "Instagram Graph API",
-        status: youtube.instagram.enabled ? "connected" : youtube.instagram.providerType === "disabled" ? "warning" : "error",
+        status: youtube.instagram.enabled ? "connected" : "warning",
         providerType: youtube.instagram.providerType,
         message: youtube.instagram.enabled
           ? "Instagram hashtag search connected"
@@ -184,7 +186,9 @@ async function refreshIntegrations(liveMode = false) {
         message:
           shopping.modeUsed === "live"
             ? "Live Google Shopping data connected"
-            : "Fallback to mock shopping data",
+            : env.hasSerpapi
+              ? "Fallback to mock shopping data"
+              : "SerpApi not configured. Using mock shopping data.",
         lastSyncAt: now,
         lastSuccessAt: now,
         itemsProcessed: shopping.items.length
@@ -231,7 +235,7 @@ async function getIntegrationStatus() {
   return {
     mode: env.useMockData ? "mock" : "database",
     liveConfigured: {
-      googleTrends: ["configured", "package-fallback"].includes(getProviderStatus("googleTrends")),
+      googleTrends: true,
       youtube: getProviderStatus("youtube") === "configured",
       shopping: getProviderStatus("shopping") === "configured",
       instagram: getProviderStatus("instagram") === "configured"

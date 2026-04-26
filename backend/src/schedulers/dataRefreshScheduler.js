@@ -13,11 +13,11 @@ function startDailyRefreshScheduler() {
   }
 
   const shouldUseLiveMode = Boolean(
-    env.youtubeApiKey ||
-      env.serpapiKey ||
-      (env.metaAccessToken && env.instagramBusinessAccountId) ||
-      env.googleTrendsApiKey ||
-      env.googleTrendsApiUrl
+    env.hasGoogleTrendsPackageFallback ||
+      env.hasYoutubeApi ||
+      env.hasSerpapi ||
+      env.hasInstagramApi ||
+      env.hasOfficialGoogleTrendsApi
   );
 
   refreshIntegrations(shouldUseLiveMode).catch((error) => {

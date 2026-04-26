@@ -105,6 +105,8 @@ Notes:
 
 - Google Trends does not have a stable public official API documented in the sources I checked, so this project uses the `google-trends-api` npm package as the default live fallback.
 - `GOOGLE_TRENDS_API_URL` is optional and only needed if you have access to a private or alpha Trends endpoint.
+- `YOUTUBE_API_KEY` is the main free official API key you can use for live signals in this project.
+- `SERPAPI_KEY` is optional. If it is missing, shopping data falls back to mock marketplace records instead of breaking the app.
 - Instagram is optional and only used when both Meta credentials are provided.
 - If live providers fail or keys are missing, the app falls back to mock data and marks the result as partial when appropriate.
 

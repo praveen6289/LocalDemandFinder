@@ -1,6 +1,7 @@
 const liveYoutubeClient = require("../integrations/youtube/youtubeClient");
 const liveInstagramClient = require("../integrations/instagram/instagramClient");
 const mockSocialSignalsIntegration = require("../integrations/socialSignals");
+const { env } = require("../config/env");
 
 async function getSocialSignalData({ keyword, location = "", liveMode = false }) {
   const warnings = [];
@@ -8,13 +9,17 @@ async function getSocialSignalData({ keyword, location = "", liveMode = false })
   let youtube = null;
   let instagram = null;
 
-  if (liveMode) {
+  if (liveMode && env.hasYoutubeApi) {
     try {
       youtube = await liveYoutubeClient.getYoutubeSignals({ keyword, location });
     } catch (error) {
       warnings.push(`YouTube live data unavailable: ${error.message}`);
     }
+  } else if (liveMode && !env.hasYoutubeApi) {
+    warnings.push("YouTube live data unavailable: missing YOUTUBE_API_KEY");
+  }
 
+  if (liveMode && env.hasInstagramApi) {
     try {
       instagram = await liveInstagramClient.getInstagramSignals({ keyword });
     } catch (error) {
@@ -33,7 +38,8 @@ async function getSocialSignalData({ keyword, location = "", liveMode = false })
       engagementScore: fallback.engagementScore,
       providerType: "mock",
       source: fallback.source,
-      modeUsed: "mock"
+      modeUsed: "mock",
+      liveProviderConfigured: env.hasYoutubeApi
     };
   }
 
@@ -45,7 +51,8 @@ async function getSocialSignalData({ keyword, location = "", liveMode = false })
       source: "instagram-graph-api",
       postsCount: 0,
       engagementScore: 0,
-      items: []
+      items: [],
+      liveProviderConfigured: env.hasInstagramApi
     };
   }
 

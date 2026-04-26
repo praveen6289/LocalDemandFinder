@@ -21,6 +21,12 @@ const env = {
   instagramBusinessAccountId: process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID || ""
 };
 
+env.hasOfficialGoogleTrendsApi = Boolean(env.googleTrendsApiKey && env.googleTrendsApiUrl);
+env.hasGoogleTrendsPackageFallback = true;
+env.hasYoutubeApi = Boolean(env.youtubeApiKey);
+env.hasSerpapi = Boolean(env.serpapiKey);
+env.hasInstagramApi = Boolean(env.metaAccessToken && env.instagramBusinessAccountId);
+
 module.exports = {
   env
 };

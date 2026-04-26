@@ -13,6 +13,7 @@ async function addObservation(req, res, next) {
       "searchInterest"
     ];
 
+    console.log("req>>>>>>>>>>>>>>>>>>>>>>",req.body);
     const missingField = requiredFields.find((field) => req.body[field] === undefined || req.body[field] === "");
 
     if (missingField) {
